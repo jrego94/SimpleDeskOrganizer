@@ -13,9 +13,8 @@ namespace OrganizerDesk
         public Form1()
         {
             InitializeComponent();
-            backgroundWorker1.DoWork += backgroundWorker1_DoWork;
-            backgroundWorker1.ProgressChanged += backgroundWorker1_ProgressChanged;
             backgroundWorker1.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;  //Tell the user how the process went
+            backgroundWorker1.ProgressChanged += backgroundWorker1_ProgressChanged;
             backgroundWorker1.WorkerReportsProgress = true;
             backgroundWorker1.WorkerSupportsCancellation = true;
         }
@@ -27,13 +26,30 @@ namespace OrganizerDesk
         private void BtnSelectFrom_Click(object sender, EventArgs e)
         {
             PathFrom = getPath();
-            TxtPathFrom.Text = PathFrom;
+
+            if (PathFrom != null)
+            {
+                TxtPathFrom.Text = PathFrom;
+                writeDetailsOnConsole("Path from:", PathFrom);
+            }
+            else
+            {
+                TxtPathFrom.Text = "Need to choose a fodler";
+            }
         }
 
         private void BtnSelectTo_Click(object sender, EventArgs e)
         {
             PathTo = getPath();
-            TxtPathTo.Text = PathTo;
+            if (PathTo != null)
+            {
+                TxtPathTo.Text = PathTo;
+                writeDetailsOnConsole("Path to:", PathTo);
+            }
+            else
+            {
+                TxtPathTo.Text = "Need to choose a fodler";
+            }
         }
 
         private string getPath()
@@ -50,27 +66,33 @@ namespace OrganizerDesk
             };
             if (folderBrowser.ShowDialog() == DialogResult.OK)
             {
-
                 return Path.GetDirectoryName(folderBrowser.FileName);
-                //PathTo = Path.GetDirectoryName(folderBrowser.FileName);
-                //TxtPathTo.Text = PathTo;
-
-                //int fCount = Directory.GetFiles(PathTo, "*", SearchOption.AllDirectories).Length;
-                //int dCount = Directory.GetDirectories(PathTo, "*", SearchOption.AllDirectories).Length;
-
-                //TxtConsole.AppendText("Path To: " + PathFrom + Environment.NewLine +
-                //    fCount + " Files" + Environment.NewLine +
-                //    dCount + " Directories" + Environment.NewLine
-                //    );
-                
             }
             return null;
         }
 
+        private void writeDetailsOnConsole(string description, string path)
+        {
+            int fCount = Directory.GetFiles(path, "*", SearchOption.AllDirectories).Length;
+            int dCount = Directory.GetDirectories(path, "*", SearchOption.AllDirectories).Length;
+
+            TxtConsole.AppendText(description + PathFrom + Environment.NewLine +
+                fCount + " Files" + Environment.NewLine +
+                dCount + " Directories" + Environment.NewLine
+                );
+        }
+
         private void BtnRun_Click(object sender, EventArgs e)
         {
-            setEnableOnOff(false);//disable groupbox,btn and txt
-            backgroundWorker1.RunWorkerAsync();
+            if (PathFrom != null && PathTo != null)
+            {
+                setEnableOnOff(false);//disable groupbox,btn and txt
+                backgroundWorker1.RunWorkerAsync();
+            }
+            else
+            {
+                TxtConsole.AppendText("You need to choose the folders" + Environment.NewLine);
+            }
         }
 
         void DirSearch(string sDir)
@@ -193,10 +215,8 @@ namespace OrganizerDesk
 
         private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            if (PathFrom != null && PathTo != null)
-            {
-                DirSearch(PathFrom);
-            }
+
+            DirSearch(PathFrom);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
