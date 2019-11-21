@@ -4,7 +4,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace OrganizerDesk
@@ -27,58 +26,50 @@ namespace OrganizerDesk
 
         private void BtnSelectFrom_Click(object sender, EventArgs e)
         {
-            //open dialog
-            OpenFileDialog folderBrowser = new OpenFileDialog();
-            // Set validate names and check file exists to false otherwise windows will
-            // not let you select "Folder Selection."
-            folderBrowser.ValidateNames = false;
-            folderBrowser.CheckFileExists = false;
-            folderBrowser.CheckPathExists = true;
-            // Always default to Folder Selection.
-            folderBrowser.FileName = "Folder";
-            if (folderBrowser.ShowDialog() == DialogResult.OK)
-            {
-                PathFrom = Path.GetDirectoryName(folderBrowser.FileName);
-                TxtPathFrom.Text = PathFrom;
-
-                int fCount = Directory.GetFiles(PathFrom, "*", SearchOption.AllDirectories).Length;
-                int dCount = Directory.GetDirectories(PathFrom, "*", SearchOption.AllDirectories).Length;
-
-                TxtConsole.AppendText("Path From: " + PathFrom + Environment.NewLine +
-                    fCount + " Files" + Environment.NewLine +
-                    dCount + " Directories" + Environment.NewLine
-                    );
-            }
+            PathFrom = getPath();
+            TxtPathFrom.Text = PathFrom;
         }
 
         private void BtnSelectTo_Click(object sender, EventArgs e)
         {
-            OpenFileDialog folderBrowser = new OpenFileDialog();
-            // Set validate names and check file exists to false otherwise windows will
-            // not let you select "Folder Selection."
-            folderBrowser.ValidateNames = false;
-            folderBrowser.CheckFileExists = false;
-            folderBrowser.CheckPathExists = true;
-            // Always default to Folder Selection.
-            folderBrowser.FileName = "Folder Selection.";
+            PathTo = getPath();
+            TxtPathTo.Text = PathTo;
+        }
+
+        private string getPath()
+        {
+            OpenFileDialog folderBrowser = new OpenFileDialog
+            {
+                // Set validate names and check file exists to false otherwise windows will
+                // not let you select "Folder Selection."
+                ValidateNames = false,
+                CheckFileExists = false,
+                CheckPathExists = true,
+                // Always default to Folder Selection.
+                FileName = "Folder Selection."
+            };
             if (folderBrowser.ShowDialog() == DialogResult.OK)
             {
-                PathTo = Path.GetDirectoryName(folderBrowser.FileName);
-                TxtPathTo.Text = PathTo;
 
-                int fCount = Directory.GetFiles(PathTo, "*", SearchOption.AllDirectories).Length;
-                int dCount = Directory.GetDirectories(PathTo, "*", SearchOption.AllDirectories).Length;
+                return Path.GetDirectoryName(folderBrowser.FileName);
+                //PathTo = Path.GetDirectoryName(folderBrowser.FileName);
+                //TxtPathTo.Text = PathTo;
 
-                TxtConsole.AppendText("Path To: " + PathFrom + Environment.NewLine +
-                    fCount + " Files" + Environment.NewLine +
-                    dCount + " Directories" + Environment.NewLine
-                    );
+                //int fCount = Directory.GetFiles(PathTo, "*", SearchOption.AllDirectories).Length;
+                //int dCount = Directory.GetDirectories(PathTo, "*", SearchOption.AllDirectories).Length;
+
+                //TxtConsole.AppendText("Path To: " + PathFrom + Environment.NewLine +
+                //    fCount + " Files" + Environment.NewLine +
+                //    dCount + " Directories" + Environment.NewLine
+                //    );
+                
             }
+            return null;
         }
 
         private void BtnRun_Click(object sender, EventArgs e)
         {
-            setEnableOnOFf(false);//disable groupbox,btn and txt
+            setEnableOnOff(false);//disable groupbox,btn and txt
             backgroundWorker1.RunWorkerAsync();
         }
 
@@ -231,13 +222,13 @@ namespace OrganizerDesk
                 TxtConsole.AppendText("Process was completed" + Environment.NewLine);
 
             }
-            setEnableOnOFf(true);
+            setEnableOnOff(true);
 
             TxtConsole.SelectionStart = TxtConsole.Text.Length;
             TxtConsole.ScrollToCaret();
         }
 
-        private void setEnableOnOFf(Boolean b)
+        private void setEnableOnOff(Boolean b)
         {
             GBoxFrom.Enabled = b;
             GBoxTo.Enabled = b;

@@ -110,17 +110,17 @@
             // 
             this.TxtConsole.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TxtConsole.HideSelection = false;
-            this.TxtConsole.Location = new System.Drawing.Point(12, 227);
+            this.TxtConsole.Location = new System.Drawing.Point(12, 218);
             this.TxtConsole.Multiline = true;
             this.TxtConsole.Name = "TxtConsole";
             this.TxtConsole.ReadOnly = true;
             this.TxtConsole.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TxtConsole.Size = new System.Drawing.Size(776, 280);
+            this.TxtConsole.Size = new System.Drawing.Size(776, 289);
             this.TxtConsole.TabIndex = 4;
             // 
             // BtnRun
             // 
-            this.BtnRun.Location = new System.Drawing.Point(12, 198);
+            this.BtnRun.Location = new System.Drawing.Point(12, 189);
             this.BtnRun.Name = "BtnRun";
             this.BtnRun.Size = new System.Drawing.Size(621, 23);
             this.BtnRun.TabIndex = 5;
@@ -134,7 +134,7 @@
             this.GBoxOpt.Controls.Add(this.RBtnCopy);
             this.GBoxOpt.Location = new System.Drawing.Point(13, 137);
             this.GBoxOpt.Name = "GBoxOpt";
-            this.GBoxOpt.Size = new System.Drawing.Size(775, 55);
+            this.GBoxOpt.Size = new System.Drawing.Size(775, 46);
             this.GBoxOpt.TabIndex = 6;
             this.GBoxOpt.TabStop = false;
             this.GBoxOpt.Text = "Options";
@@ -163,7 +163,7 @@
             // 
             // BtnClearConsole
             // 
-            this.BtnClearConsole.Location = new System.Drawing.Point(639, 198);
+            this.BtnClearConsole.Location = new System.Drawing.Point(639, 189);
             this.BtnClearConsole.Name = "BtnClearConsole";
             this.BtnClearConsole.Size = new System.Drawing.Size(149, 23);
             this.BtnClearConsole.TabIndex = 7;
@@ -197,7 +197,7 @@
             this.Controls.Add(this.GBoxFrom);
             this.Name = "Form1";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-            this.Text = "Form1";
+            this.Text = "SimpleDeskOrganizer";
             this.GBoxFrom.ResumeLayout(false);
             this.GBoxFrom.PerformLayout();
             this.GBoxTo.ResumeLayout(false);
