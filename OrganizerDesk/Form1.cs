@@ -21,6 +21,11 @@ namespace OrganizerDesk
 
         public string PathFrom { get; private set; }
         public string PathTo { get; private set; }
+        public bool boolYear { get; private set; }
+        public bool boolMonth { get; private set; }
+        public bool boolDay { get; private set; }
+
+        private const string V = "/";
         private static readonly Regex r = new Regex(":");
 
         private void BtnSelectFrom_Click(object sender, EventArgs e)
@@ -30,7 +35,8 @@ namespace OrganizerDesk
             if (PathFrom != null)
             {
                 TxtPathFrom.Text = PathFrom;
-                writeDetailsOnConsole("Path from:", PathFrom);
+                progressBar1.Maximum = countFiles(PathFrom);
+                writeDetailsOnConsole("Path from:", countFiles(PathFrom), countDir(PathFrom));
             }
             else
             {
@@ -44,7 +50,7 @@ namespace OrganizerDesk
             if (PathTo != null)
             {
                 TxtPathTo.Text = PathTo;
-                writeDetailsOnConsole("Path to:", PathTo);
+                writeDetailsOnConsole("Path to:", countFiles(PathTo), countDir(PathTo));
             }
             else
             {
@@ -71,16 +77,24 @@ namespace OrganizerDesk
             return null;
         }
 
-        private void writeDetailsOnConsole(string description, string path)
+        private int countFiles(string path)
         {
-            int fCount = Directory.GetFiles(path, "*", SearchOption.AllDirectories).Length;
-            int dCount = Directory.GetDirectories(path, "*", SearchOption.AllDirectories).Length;
+            return Directory.GetFiles(path, "*", SearchOption.AllDirectories).Length;
+        }
 
+        private int countDir(string path)
+        {
+            return Directory.GetDirectories(path, "*", SearchOption.AllDirectories).Length;
+        }
+
+        private void writeDetailsOnConsole(string description, int nFiles, int nDir)
+        {
             TxtConsole.AppendText(description + PathFrom + Environment.NewLine +
-                fCount + " Files" + Environment.NewLine +
-                dCount + " Directories" + Environment.NewLine
+                nFiles + " Files" + Environment.NewLine +
+                nDir + " Directories" + Environment.NewLine
                 );
         }
+
 
         private void BtnRun_Click(object sender, EventArgs e)
         {
@@ -95,7 +109,7 @@ namespace OrganizerDesk
             }
         }
 
-        void DirSearch(string sDir)
+        private void DirSearch(string sDir)
         {
             try
             {
@@ -116,7 +130,7 @@ namespace OrganizerDesk
             }
             catch (Exception ex)
             {
-                backgroundWorker1.ReportProgress(0, String.Format("Catch # {0}", ex));
+                backgroundWorker1.ReportProgress(0, string.Format("Catch # {0}", ex));
             }
 
         }
@@ -134,76 +148,90 @@ namespace OrganizerDesk
                     {
                         propItem = myImage.GetPropertyItem(36867);
                     }
-                    catch { }
+                    catch (Exception e)
+                    {
+                        _ = e;
+                    }
                     if (propItem != null)
                     {
                         string dateTaken = r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
                         return DateTime.Parse(dateTaken);
                     }
                     else
+                    {
                         return new FileInfo(path).CreationTime;
+                    }
                 }
             }
             catch (Exception)
             {
                 return new FileInfo(path).CreationTime;
             }
-
         }
-
 
         private void MovFiles(string filePath, string name, DateTime date)
         {
-            string pathyear = PathTo + "/" + date.Year;
-            string pathmouth = pathyear + "/" + date.Month;
-            string pathday = pathmouth + "/" + date.Day;
+            string lastPath = PathTo;
             try
             {
-                if (!Directory.Exists(pathyear))
+                if (boolYear)
                 {
-                    Directory.CreateDirectory(pathyear);
+                    lastPath += V + date.Year;
+                    if (!Directory.Exists(lastPath))
+                    {
+                        Directory.CreateDirectory(lastPath);
+                    }
                 }
 
-                if (!Directory.Exists(pathmouth))
+                if (boolMonth)
                 {
-                    Directory.CreateDirectory(pathmouth);
+                    lastPath += V + date.ToString("yyyy-MM");
+                    if (!Directory.Exists(lastPath))
+                    {
+                        Directory.CreateDirectory(lastPath);
+                    }
                 }
 
-                if (!Directory.Exists(pathday))
+                if (boolDay)
                 {
-                    Directory.CreateDirectory(pathday);
+                    lastPath += V + date.ToString("yyyy-MM-dd");
+                    if (!Directory.Exists(lastPath))
+                    {
+                        Directory.CreateDirectory(lastPath);
+                    }
                 }
+
 
                 if (RBtnCopy.Checked)
                 {
-                    if (!File.Exists(pathday + "/" + name))
+                    if (!File.Exists(lastPath + V + name))
                     {
-                        File.Copy(filePath, pathday + "/" + name);
-                        backgroundWorker1.ReportProgress(0, String.Format("Copied # {0}", filePath));
+                        File.Copy(filePath, lastPath + V + name);
+                        backgroundWorker1.ReportProgress(0, string.Format("Copied # {0}", filePath));
                     }
                     else
                     {
-                        backgroundWorker1.ReportProgress(0, String.Format("Not copied # {0}", filePath));
+                        backgroundWorker1.ReportProgress(0, string.Format("Not copied # {0}", filePath));
                     }
 
                 }
                 else if (RBtnMove.Checked)
                 {
-                    if (!File.Exists(pathday + "/" + name))
+                    if (!File.Exists(lastPath + V + name))
                     {
-                        File.Move(filePath, pathday + "/" + name);
-                        backgroundWorker1.ReportProgress(0, String.Format("Moved # {0}", filePath));
+                        File.Move(filePath, lastPath + V + name);
+                        backgroundWorker1.ReportProgress(0, string.Format("Moved # {0}", filePath));
                     }
                     else
                     {
-                        backgroundWorker1.ReportProgress(0, String.Format("Not moved # {0}", filePath));
+                        backgroundWorker1.ReportProgress(0, string.Format("Not moved # {0}", filePath));
                     }
                 }
 
             }
             catch (Exception ex)
             {
-                backgroundWorker1.ReportProgress(0, String.Format("Error # {0}", ex));
+                backgroundWorker1.ReportProgress(0, string.Format("Error # {0}", ex));
             }
 
         }
@@ -215,13 +243,12 @@ namespace OrganizerDesk
 
         private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-
             DirSearch(PathFrom);
         }
 
         private void backgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
         {
-            progressBar1.Value = e.ProgressPercentage;
+            progressBar1.Value += 1;
             TxtConsole.AppendText(e.UserState as string + Environment.NewLine);
             TxtConsole.SelectionStart = TxtConsole.Text.Length;
             TxtConsole.ScrollToCaret();
@@ -248,7 +275,7 @@ namespace OrganizerDesk
             TxtConsole.ScrollToCaret();
         }
 
-        private void setEnableOnOff(Boolean b)
+        private void setEnableOnOff(bool b)
         {
             GBoxFrom.Enabled = b;
             GBoxTo.Enabled = b;
@@ -259,5 +286,19 @@ namespace OrganizerDesk
             BtnRun.Enabled = b;
         }
 
+        private void CB_Yeay_CheckedChanged(object sender, EventArgs e)
+        {
+            boolYear = CB_Yeay.Checked;
+        }
+
+        private void CB_Month_CheckedChanged(object sender, EventArgs e)
+        {
+            boolMonth = CB_Month.Checked;
+        }
+
+        private void CB_Day_CheckedChanged(object sender, EventArgs e)
+        {
+            boolDay = CB_Day.Checked;
+        }
     }
 }
